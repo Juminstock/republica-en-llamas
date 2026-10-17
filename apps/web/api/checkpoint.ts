@@ -1,5 +1,6 @@
 import { isAddress, parseEther, type Address } from 'viem'
 import { serverConfig, json, handleError } from './_lib/config.js'
+import { requirePlayer } from './_lib/auth.js'
 import { domain, checkpointTypes, type Checkpoint } from './_lib/typedData.js'
 import { CHOICE_IDS, TASK_EARN_CAP } from '../src/features/session/rules.js'
 
@@ -37,7 +38,8 @@ export async function POST(request: Request) {
     }
     const fates = (body.fates ?? [0, 0, 0]).map((f) => Math.min(Math.max(Math.floor(f), 0), 3)) as [number, number, number]
 
-    const { chain, contracts, signer } = serverConfig()
+    const { chain, contracts, signer, publicClient } = serverConfig()
+    await requirePlayer(request, body.player, publicClient)
     const cp: Checkpoint = {
       player: body.player,
       level: body.level,

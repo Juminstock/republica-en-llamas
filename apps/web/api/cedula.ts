@@ -1,6 +1,7 @@
 import { put } from '@vercel/blob'
 import { isAddress, keccak256, toHex, type Address } from 'viem'
 import { serverConfig, json, handleError } from './_lib/config.js'
+import { requirePlayer } from './_lib/auth.js'
 import { domain, claimTypes } from './_lib/typedData.js'
 
 const MAX_PHOTO_BYTES = 600_000
@@ -17,6 +18,8 @@ type CedulaRequest = {
 }
 
 const clean = (s: unknown, max = 40) => String(s ?? '').replace(/[<>]/g, '').trim().slice(0, max)
+// The client always sends a canvas JPEG; anything else is not from the game.
+const isJpeg = (b: Buffer) => b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff
 
 // Registraduría: stores the game identity offchain and returns a signed claim
 // the player's smart account submits to Cedula.claim().
@@ -28,6 +31,7 @@ export async function POST(request: Request) {
     if (!alias) return json({ error: 'alias_required' }, 400)
 
     const { chain, contracts, signer, publicClient } = serverConfig()
+    await requirePlayer(request, body.player, publicClient)
 
     const existing = await publicClient.readContract({
       address: contracts.cedula,
@@ -42,6 +46,7 @@ export async function POST(request: Request) {
     if (body.photo?.startsWith('data:image/')) {
       const bytes = Buffer.from(body.photo.split(',')[1] ?? '', 'base64')
       if (bytes.length > MAX_PHOTO_BYTES) return json({ error: 'photo_too_large' }, 413)
+      if (!isJpeg(bytes)) return json({ error: 'photo_not_jpeg' }, 415)
       const blob = await put(`cedulas/${player}/photo.jpg`, bytes, { access: 'public', contentType: 'image/jpeg', allowOverwrite: true })
       photoUrl = blob.url
     }

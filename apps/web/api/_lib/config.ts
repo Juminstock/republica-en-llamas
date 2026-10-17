@@ -6,6 +6,7 @@ import deployments from '../../src/lib/chain/deployments.json' with { type: 'jso
 const CHAINS = { monadTestnet, soneiumMinato } as const
 
 export class ConfigError extends Error {}
+export class AuthError extends Error {}
 
 export function serverConfig() {
   const networkKey = (process.env.VITE_NETWORK ?? 'monadTestnet') as keyof typeof CHAINS
@@ -35,6 +36,7 @@ export function json(body: unknown, status = 200) {
 
 export function handleError(err: unknown) {
   if (err instanceof ConfigError) return json({ error: 'not_configured', detail: err.message }, 503)
+  if (err instanceof AuthError) return json({ error: 'unauthorized' }, 401)
   console.error(err)
   return json({ error: 'internal' }, 500)
 }

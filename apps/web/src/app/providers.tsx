@@ -14,10 +14,13 @@ export function Providers({ children }: { children: ReactNode }) {
     <PrivyProvider
       appId={env.privyAppId}
       config={{
-        loginMethods: ['email', 'google', 'apple'],
+        // Apple needs an Apple Developer account and its own OAuth credentials; add it later.
+        loginMethods: ['email', 'google'],
         appearance: { theme: 'dark', accentColor: '#f2b705' },
         defaultChain: network.chain,
         supportedChains: [network.chain],
+        // We never use Coinbase's smart wallet (it doesn't support our chain); EOA mode silences its chain check.
+        externalWallets: { coinbaseWallet: { config: { preference: { options: 'eoaOnly' } } } },
         embeddedWallets: {
           ethereum: { createOnLogin: 'all-users' },
           // The player never sees a wallet prompt; the game pays gas through the paymaster.

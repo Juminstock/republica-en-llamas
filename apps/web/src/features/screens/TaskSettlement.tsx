@@ -65,7 +65,8 @@ export function ColombiaChose({ choiceId, question, options }: { choiceId: strin
     readChoiceStats(CHOICE_IDS[choiceId]).then(setCounts).catch(() => setCounts(null))
   }, [choiceId, confirmed])
 
-  const shown = counts ?? options.map((_, i) => (i === mine ? 1 : 0))
+  const onchain = counts && counts.slice(0, options.length).some((c) => c > 0) ? counts : null
+  const shown = onchain ?? options.map((_, i) => (i === mine ? 1 : 0))
   const total = shown.slice(0, options.length).reduce((a, b) => a + b, 0) || 1
 
   return (
@@ -86,7 +87,7 @@ export function ColombiaChose({ choiceId, question, options }: { choiceId: strin
           </div>
         )
       })}
-      <p className="mt-2 text-[11px] text-ink/60">{counts ? `${total} ciudadanos · leído de la blockchain` : 'Modo demo local: solo tu decisión'}</p>
+      <p className="mt-2 text-[11px] text-ink/60">{onchain ? `${total} ciudadanos · leído de la blockchain` : 'Todavía no hay votos onchain: solo tu decisión'}</p>
     </div>
   )
 }

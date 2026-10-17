@@ -1,4 +1,5 @@
 import type { Hex } from 'viem'
+import { getIdentityToken } from '@privy-io/react-auth'
 import { abis, deployment } from './contracts'
 import { network } from './networks'
 import { publicClient } from './smartAccount'
@@ -12,8 +13,15 @@ function ready() {
   return { client, address, deployment }
 }
 
+// The API only signs for the smart account of the Privy user named in this token.
 async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+  const idToken = await getIdentityToken()
+  if (!idToken) throw new ChainUnavailable('Sesión expirada, vuelve a iniciar sesión')
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'privy-id-token': idToken },
+    body: JSON.stringify(body),
+  })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`)
   return data as T

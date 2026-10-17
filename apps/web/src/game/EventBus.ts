@@ -1,22 +1,25 @@
-import Phaser from 'phaser'
+// The only channel between the 3D scene and React overlays.
+export type HandIcon = 'open' | 'fist' | 'document' | 'bunuelo'
 
-// The only channel between Phaser and React. Phaser never imports React state.
 export type GameEvents = {
-  'scene:ready': { scene: string }
   'interact:available': { id: string; label: string; hand: HandIcon } | null
   'interact': { id: string }
 }
 
-export type HandIcon = 'open' | 'fist' | 'document' | 'bunuelo'
+type Listener<K extends keyof GameEvents> = (payload: GameEvents[K]) => void
 
-class TypedBus extends Phaser.Events.EventEmitter {
+class TypedBus {
+  private listeners = new Map<keyof GameEvents, Set<Listener<never>>>()
+
   emitEvent<K extends keyof GameEvents>(event: K, payload: GameEvents[K]) {
-    return this.emit(event, payload)
+    this.listeners.get(event)?.forEach((fn) => (fn as Listener<K>)(payload))
   }
-  onEvent<K extends keyof GameEvents>(event: K, fn: (payload: GameEvents[K]) => void) {
-    this.on(event, fn)
+
+  onEvent<K extends keyof GameEvents>(event: K, fn: Listener<K>) {
+    if (!this.listeners.has(event)) this.listeners.set(event, new Set())
+    this.listeners.get(event)!.add(fn as Listener<never>)
     return () => {
-      this.off(event, fn)
+      this.listeners.get(event)?.delete(fn as Listener<never>)
     }
   }
 }

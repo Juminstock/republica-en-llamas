@@ -1,10 +1,12 @@
 import { head } from '@vercel/blob'
+import { keccak256, toHex } from 'viem'
 import { serverConfig, json, handleError } from '../_lib/config.js'
 import { cedulaSvg, type Identity } from '../_lib/cedulaSvg.js'
 
 const cedulaAbi = [
   { type: 'function', name: 'ownerOf', stateMutability: 'view', inputs: [{ type: 'uint256' }], outputs: [{ type: 'address' }] },
   { type: 'function', name: 'stampsOf', stateMutability: 'view', inputs: [{ type: 'uint256' }], outputs: [{ type: 'uint16' }] },
+  { type: 'function', name: 'metadataHashOf', stateMutability: 'view', inputs: [{ type: 'uint256' }], outputs: [{ type: 'bytes32' }] },
 ] as const
 
 // ERC721 metadata for Cedula.tokenURI(id) = <base>/<id>. The image is an SVG built on request,
@@ -16,16 +18,19 @@ export async function GET(request: Request) {
     const tokenId = BigInt(id)
 
     const { contracts, publicClient } = serverConfig()
-    const [owner, stamps] = await Promise.all([
+    const [owner, stamps, metadataHash] = await Promise.all([
       publicClient.readContract({ address: contracts.cedula, abi: cedulaAbi, functionName: 'ownerOf', args: [tokenId] }),
       publicClient.readContract({ address: contracts.cedula, abi: cedulaAbi, functionName: 'stampsOf', args: [tokenId] }),
-    ]).catch(() => [null, 0] as const)
+      publicClient.readContract({ address: contracts.cedula, abi: cedulaAbi, functionName: 'metadataHashOf', args: [tokenId] }),
+    ]).catch(() => [null, 0, null] as const)
     if (!owner) return json({ error: 'not_found' }, 404)
 
     let identity: Identity = { alias: 'Ciudadano', city: '', university: '', career: '', rh: '', photoUrl: null }
     try {
       const meta = await head(`cedulas/${owner.toLowerCase()}/identity.json`)
-      identity = (await (await fetch(meta.url)).json()) as Identity
+      const text = await (await fetch(meta.url)).text()
+      // Only the identity the player claimed onchain; anything else in Blob is ignored.
+      if (keccak256(toHex(text)) === metadataHash) identity = JSON.parse(text) as Identity
     } catch {
       // Photo or identity deleted on request: render the silhouette card.
     }

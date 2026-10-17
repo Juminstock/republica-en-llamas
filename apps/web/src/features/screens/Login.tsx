@@ -1,10 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { useSmartAccount } from '../../lib/chain/smartAccount'
 import { useChain } from '../../lib/chain/chainStore'
 import { readCedulaId } from '../../lib/chain/actions'
 import { deployment } from '../../lib/chain/contracts'
-import { useGame } from '../session/gameStore'
 
 // Keeps the smart account in the chain store for the whole session. Only mounted when Privy is configured.
 export function AccountBridge() {
@@ -22,37 +21,29 @@ export function AccountBridge() {
   return null
 }
 
-export function Login() {
+// "¡Empieza a jugar!": opens the Privy login first when needed, then starts the game.
+export function StartWithLogin({ onStart }: { onStart: () => void }) {
   const { ready, authenticated, login } = usePrivy()
-  const address = useChain((s) => s.address)
-  const cedulaId = useChain((s) => s.cedulaId)
+  const pending = useRef(false)
 
   useEffect(() => {
-    if (!authenticated || !address) return
-    if (!deployment) {
-      useGame.getState().go('game')
-      return
+    if (pending.current && authenticated) {
+      pending.current = false
+      onStart()
     }
-    if (cedulaId === null) return
-    useGame.getState().go(cedulaId > 0n ? 'game' : 'registraduria')
-  }, [authenticated, address, cedulaId])
+  }, [authenticated])
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-ink p-6 text-center text-paper">
-      <h2 className="font-display text-4xl text-cedula">REGISTRADURÍA NACIONAL</h2>
-      <p className="max-w-sm text-paper/80">
-        Para graduarte primero tienes que existir. Entra con tu correo: te creamos una cuenta y tu cédula de superviviente. Sin contraseñas raras, sin pagar nada.
-      </p>
-      {authenticated ? (
-        <p className="animate-pulse text-paper/70">Buscando tu expediente…</p>
-      ) : (
-        <button className="btn text-xl" disabled={!ready} onClick={login}>
-          Entrar con correo o Google
-        </button>
-      )}
-      <button className="btn-ghost text-sm" onClick={() => useGame.getState().go('game')}>
-        Jugar sin cuenta (modo demo local)
-      </button>
-    </div>
+    <button
+      className="btn px-10 py-3 text-2xl"
+      disabled={!ready}
+      onClick={() => {
+        if (authenticated) return onStart()
+        pending.current = true
+        login()
+      }}
+    >
+      ¡Empieza a jugar!
+    </button>
   )
 }

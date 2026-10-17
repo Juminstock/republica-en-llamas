@@ -35,3 +35,12 @@ export async function toCedulaPhoto(file: File): Promise<string> {
     URL.revokeObjectURL(url)
   }
 }
+
+export const CEDULA_PHOTO_COUNT = 15
+
+// One of the Registraduría's stock ID photos, picked at random and given the printed look.
+export async function randomCedulaPhoto(): Promise<string> {
+  const n = String(1 + Math.floor(Math.random() * CEDULA_PHOTO_COUNT)).padStart(2, '0')
+  const blob = await (await fetch(`/assets/cedula/${n}.jpg`)).blob()
+  return toCedulaPhoto(new File([blob], `${n}.jpg`, { type: 'image/jpeg' }))
+}

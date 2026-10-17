@@ -27,7 +27,7 @@ To turn the chain on, copy `apps/web/.env.example` to `apps/web/.env.local` and 
 
 | Variable | Where it comes from |
 | --- | --- |
-| `VITE_PRIVY_APP_ID` | dashboard.privy.io. Enable email, Google and Apple login, and add Monad Testnet. |
+| `VITE_PRIVY_APP_ID` | dashboard.privy.io. Enable email and Google login, add Monad Testnet, and turn on identity tokens (the API uses them to check who is playing). |
 | `VITE_PIMLICO_API_KEY` | dashboard.pimlico.io. Restrict the key to your domains. |
 | `VITE_PIMLICO_SPONSORSHIP_POLICY_ID` | Optional Pimlico policy, limited to our 3 contracts with a daily cap per account |
 | `SERVER_SIGNER_PRIVATE_KEY` | A fresh key used only for signing. Its address is `SERVER_SIGNER` at deploy time. |

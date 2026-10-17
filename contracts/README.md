@@ -52,3 +52,15 @@ The domain is `{ name: "RepublicaEnLlamas", version: "1", chainId, verifyingCont
 Claim(address player,bytes32 metadataHash,uint256 deadline)
 Checkpoint(address player,uint16 level,uint8 task,uint16[] choiceIds,uint8[] options,uint8[3] fates,uint256 earned,uint256 spent,uint256 nonce,uint256 deadline)
 ```
+
+## Sellos (one onchain mint per stamp)
+
+`Sellos` is a soulbound ERC1155. Each stamp a player earns is its own `mint(selloId, deadline, sig)`, signed by the same server signer and only for Cédula holders. It deploys next to the existing contracts without touching them, and merges `"sellos"` into `deployments/<chainId>.json`:
+
+```bash
+SELLOS_BASE_URI=https://<app>/api/sellos/ \
+forge script script/DeploySellos.s.sol --rpc-url monad_testnet --account deployer --broadcast \
+  --verify --verifier sourcify
+```
+
+Then run `./scripts/export-abis.sh` (or `pnpm abis` from the root). EIP712 type: `Sello(address player,uint16 selloId,uint256 deadline)`, same domain as the other contracts with `verifyingContract` = Sellos.

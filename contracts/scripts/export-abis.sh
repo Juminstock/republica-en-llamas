@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 DEST=../apps/web/src/lib/chain/abis
 mkdir -p "$DEST"
-for name in Cedula Bunuelo RepublicaLedger; do
+for name in Cedula Bunuelo RepublicaLedger Sellos; do
   node -e "const a=require('./out/$name.sol/$name.json').abi;process.stdout.write(JSON.stringify(a,null,2)+'\n')" > "$DEST/$name.json"
   echo "exported $DEST/$name.json"
 done

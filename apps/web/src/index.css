@@ -7,7 +7,7 @@
   --color-fire: #e4572e;
   --color-alert: #d7263d;
   --color-military: #4b5d3a;
-  --font-display: Impact, "Anton", "Arial Narrow", sans-serif;
+  --font-display: Impact, "Anton", "Arial Narrow Bold", sans-serif;
 }
 
 html,
@@ -25,13 +25,13 @@ body,
 
 @layer components {
   .btn {
-    @apply min-h-12 rounded-lg border-4 border-ink bg-cedula px-6 py-2 font-display text-lg uppercase text-ink shadow-[4px_4px_0_#000] active:translate-y-1 disabled:opacity-40;
+    @apply min-h-12 cursor-pointer rounded-lg border-4 border-ink bg-cedula px-6 py-2 font-display text-lg uppercase text-ink shadow-[4px_4px_0_#000] transition-transform duration-150 ease-out hover:scale-[1.07] active:translate-y-1 active:scale-100 disabled:opacity-40 disabled:hover:scale-100;
   }
   .input {
     @apply min-h-12 w-full rounded-lg border-4 border-ink bg-paper px-3 text-base text-ink;
   }
   .btn-ghost {
-    @apply min-h-12 rounded-lg border-2 border-paper/40 px-6 py-2 text-paper/80;
+    @apply min-h-12 cursor-pointer rounded-lg border-2 border-paper/40 px-6 py-2 text-paper/80 transition-transform duration-150 ease-out hover:scale-[1.06];
   }
 }
 
@@ -46,5 +46,78 @@ body,
   }
   100% {
     transform: scale(1) rotate(-8deg);
+  }
+}
+
+@keyframes titleIn {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.4em;
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes disclaimer {
+  0%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes bunueloBounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  45% {
+    transform: translateY(-14%) scale(0.97, 1.03);
+  }
+  60% {
+    transform: translateY(0) scale(1.06, 0.94);
+  }
+  72% {
+    transform: translateY(-3%) scale(1, 1);
+  }
+}
+
+@keyframes bunueloRoll {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes selectPop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes selloIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

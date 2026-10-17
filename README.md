@@ -50,4 +50,4 @@ Deploy and verify: see [`contracts/README.md`](contracts/README.md). After deplo
 
 ## Network
 
-`VITE_NETWORK=monadTestnet` (default) or `soneiumMinato`. Switching networks means redeploying the contracts with the same script, running `pnpm abis` and changing the variable. Pimlico supports both networks.
+`VITE_NETWORK=monadTestnet` (default). Switching networks means redeploying the contracts with the same script, running `pnpm abis` and changing the variable. Pimlico supports both networks.

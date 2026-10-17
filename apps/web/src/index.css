@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #14161f;
+  --color-paper: #f4efe1;
+  --color-cedula: #f2b705;
+  --color-fire: #e4572e;
+  --color-alert: #d7263d;
+  --color-military: #4b5d3a;
+  --font-display: Impact, "Anton", "Arial Narrow", sans-serif;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+@layer components {
+  .btn {
+    @apply min-h-12 rounded-lg border-4 border-ink bg-cedula px-6 py-2 font-display text-lg uppercase text-ink shadow-[4px_4px_0_#000] active:translate-y-1 disabled:opacity-40;
+  }
+  .input {
+    @apply min-h-12 w-full rounded-lg border-4 border-ink bg-paper px-3 text-base text-ink;
+  }
+  .btn-ghost {
+    @apply min-h-12 rounded-lg border-2 border-paper/40 px-6 py-2 text-paper/80;
+  }
+}
+
+@keyframes stamp {
+  0% {
+    transform: scale(2.4) rotate(-8deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(0.92) rotate(-8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(-8deg);
+  }
+}

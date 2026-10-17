@@ -1,0 +1,12 @@
+{
+  "name": "republica-en-llamas",
+  "private": true,
+  "packageManager": "pnpm@12.3.4",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "typecheck": "pnpm --filter web typecheck",
+    "test:contracts": "cd contracts && forge test",
+    "abis": "bash contracts/scripts/export-abis.sh"
+  }
+}
